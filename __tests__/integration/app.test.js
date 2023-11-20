@@ -69,9 +69,7 @@ describe("GET methods", () => {
 				.expect(200)
 				.then(({ body }) => {
 					const { endpoints } = body;
-					console.log(endpoints, "{<<<<<");
 					for (const [key, value] of Object.entries(endpoints)) {
-            console.log(value,'<<<endpoint')
 						expect(value).toMatchObject({
 							description: expect.any(String),
 							queries: expect.any(Array),
