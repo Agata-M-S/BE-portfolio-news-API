@@ -20,3 +20,40 @@ describe("GET /api/servercheck", () => {
 			});
 	});
 });
+
+describe("GET /api/topics", () => {
+	test("200: responds with an array of topic objects", () => {
+		return request(app)
+			.get("/api/topics")
+			.expect(200)
+			.then(({ body }) => {
+				const { topics } = body;
+				expect(topics).toBeInstanceOf(Array);
+				expect(topics).toHaveLength(3);
+			});
+	});
+	test("each object should have properties: slug, description", () => {
+		return request(app)
+			.get("/api/topics")
+			.expect(200)
+			.then(({ body }) => {
+				const { topics } = body;
+				topics.forEach((topic) => {
+					expect(topic).toMatchObject({
+						slug: expect.any(String),
+						description: expect.any(String),
+					});
+				});
+			});
+	});
+	describe("Error handling", () => {
+		test("400: /api/notavalidpath", () => {
+			return request(app)
+				.get("/api/notavalidpath")
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).toBe("path does not exist");
+				});
+		});
+	});
+});
