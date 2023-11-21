@@ -1,19 +1,30 @@
 const db = require("../db/connection");
 
-exports.selectArticle = (article_id) => {
-	let queryStr = `SELECT * FROM articles `;
-	let queryValues = [];
+exports.selectArticleById = (article_id) => {
+	let queryStr = `SELECT * FROM articles WHERE article_id = $1`;
 
-	if (article_id) {
-		queryValues.push(article_id);
-		queryStr += "WHERE article_id = $1";
-	}
-
-	return db.query(queryStr, queryValues).then(({ rows }) => {
+	return db.query(queryStr, [article_id]).then(({ rows }) => {
 		if (!rows.length) {
 			return Promise.reject({ status: 404, msg: "article does not exist" });
 		}
-
 		return rows[0];
+	});
+};
+
+exports.selectAllArticles = () => {
+	const articlesTabColumns =
+		"title, articles.author, articles.article_id, topic, articles.created_at, article_img_url, articles.votes ";
+	const commentsTabColumns = `COUNT(comments.comment_id) AS comment_count `;
+
+	const groupBy = `GROUP BY articles.article_id `;
+
+	const sortBy = `ORDER BY articles.created_at DESC`;
+
+	let queryStr = `SELECT ${articlesTabColumns}, ${commentsTabColumns} FROM articles LEFT JOIN comments
+  ON articles.article_id = comments.article_id 
+  ${groupBy} ${sortBy}`;
+
+	return db.query(queryStr).then(({ rows }) => {
+		return rows;
 	});
 };

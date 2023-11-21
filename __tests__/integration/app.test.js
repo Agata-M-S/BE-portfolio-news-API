@@ -3,6 +3,7 @@ const data = require("../../db/data/test-data/index");
 const app = require("../../app");
 const seed = require("../../db/seeds/seed");
 const db = require("../../db/connection");
+require("jest-sorted");
 
 beforeEach(() => {
 	return seed(data);
@@ -22,17 +23,6 @@ describe("GET /api/servercheck", () => {
 });
 
 describe("GET /api/topics", () => {
-	test("200: responds with an array of topic objects", () => {
-		return request(app)
-			.get("/api/topics")
-			.expect(200)
-			.then(({ body }) => {
-				const { topics } = body;
-
-				expect(topics).toBeInstanceOf(Array);
-				expect(topics).toHaveLength(3);
-			});
-	});
 	test("each object should have properties: slug, description", () => {
 		return request(app)
 			.get("/api/topics")
@@ -40,9 +30,7 @@ describe("GET /api/topics", () => {
 			.then(({ body }) => {
 				const { topics } = body;
 
-				expect(topics).toBeInstanceOf(Array);
 				expect(topics).toHaveLength(3);
-
 				topics.forEach((topic) => {
 					expect(topic).toMatchObject({
 						slug: expect.any(String),
@@ -134,6 +122,59 @@ describe("GET /api/articles/:article_id", () => {
 			.expect(404)
 			.then(({ body }) => {
 				expect(body.msg).toBe("article does not exist");
+			});
+	});
+});
+
+describe("GET /api/articles", () => {
+	test("each object in the array should have properties: author, title, article_id, topic, created_at, votes, article_im_url, comment_count", () => {
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles).toHaveLength(13);
+				articles.forEach((article) => {
+				
+
+					expect(article).toMatchObject({
+						author: expect.any(String),
+						title: expect.any(String),
+						article_id: expect.any(Number),
+						topic: expect.any(String),
+						created_at: expect.any(String),
+						votes: expect.any(Number),
+						article_img_url: expect.any(String),
+						comment_count: expect.any(String),
+					});
+				});
+			});
+	});
+
+	test("article objects in the array should be sorted by date in descending order by default", () => {
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles).toBeSortedBy("created_at", {
+					descending: true,
+				});
+			});
+	});
+	test("article objects in the array should NOT have a body property", () => {
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles).toHaveLength(13);
+				articles.forEach((article) => {
+					expect(article).not.toHaveProperty("body");
+				});
 			});
 	});
 });
