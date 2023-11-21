@@ -53,6 +53,35 @@ describe("GET /api/topics", () => {
 	});
 });
 
+describe("GET /api returns an object with a description of all other avaliable endpoints ", () => {
+	test("200: responds with a JSON object", () => {
+		return request(app)
+			.get("/api")
+			.expect(200)
+			.then(({ body }) => {
+				const { endpoints } = body;
+				expect(endpoints).toBeInstanceOf(Object);
+				expect(endpoints).not.toBeInstanceOf(Array);
+			});
+	});
+
+	test("each object has properies: description, queries, exampleResponse", () => {
+		return request(app)
+			.get("/api")
+			.expect(200)
+			.then(({ body }) => {
+				const { endpoints } = body;
+				for (const [key, value] of Object.entries(endpoints)) {
+					expect(value).toMatchObject({
+						description: expect.any(String),
+						queries: expect.any(Array),
+						exampleResponse: expect.any(Object),
+					});
+				}
+			});
+	});
+});
+
 describe("GET /api/articles/:article_id", () => {
 	test("200: responds with a correct article object", () => {
 		return request(app)
@@ -72,6 +101,7 @@ describe("GET /api/articles/:article_id", () => {
 				});
 			});
 	});
+
 	test("an article object should have properties: author, title, article_id, body, topic, created_at, votes, article_img_url", () => {
 		return request(app)
 			.get("/api/articles/3")
@@ -89,17 +119,7 @@ describe("GET /api/articles/:article_id", () => {
 				});
 			});
 	});
-});
 
-describe("Error handling", () => {
-	test("404: /api/notavalidpath", () => {
-		return request(app)
-			.get("/api/notavalidpath")
-			.expect(404)
-			.then(({ body }) => {
-				expect(body.msg).toBe("path does not exist");
-			});
-	});
 	test("GET:400 responds with an appropriate error message when given an invalid id", () => {
 		return request(app)
 			.get("/api/articles/not-an-id")
@@ -114,6 +134,17 @@ describe("Error handling", () => {
 			.expect(404)
 			.then(({ body }) => {
 				expect(body.msg).toBe("article does not exist");
+			});
+	});
+});
+
+describe("Error handling GET", () => {
+	test("400: /api/notavalidpath", () => {
+		return request(app)
+			.get("/api/notavalidpath")
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("path does not exist");
 			});
 	});
 });
