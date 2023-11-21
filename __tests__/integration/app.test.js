@@ -136,7 +136,7 @@ describe("GET /api/articles", () => {
 
 				expect(articles).toHaveLength(13);
 				articles.forEach((article) => {
-					article.comment_count = +article.comment_count;
+				
 
 					expect(article).toMatchObject({
 						author: expect.any(String),
@@ -146,7 +146,7 @@ describe("GET /api/articles", () => {
 						created_at: expect.any(String),
 						votes: expect.any(Number),
 						article_img_url: expect.any(String),
-						comment_count: expect.any(Number),
+						comment_count: expect.any(String),
 					});
 				});
 			});
