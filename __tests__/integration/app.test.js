@@ -231,9 +231,68 @@ describe("GET /api/articles/:article_id/comments", () => {
 			.expect(200)
 			.then(({ body }) => {
 				const { comments } = body;
-        expect(comments).toBeInstanceOf(Array);
+				expect(comments).toBeInstanceOf(Array);
 				expect(comments).toHaveLength(0);
-        expect(comments).toEqual([])
+				expect(comments).toEqual([]);
+			});
+	});
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+	test("201: responds with the newly posted comment object ", () => {
+		const newComment = {
+			username: "butter_bridge",
+			body: "this is my comment for the article",
+		};
+		return request(app)
+			.post("/api/articles/1/comments")
+			.send(newComment)
+			.expect(201)
+			.then(({ body }) => {
+				expect(body.comment).toMatchObject({
+					comment_id: expect.any(Number),
+					article_id: 1,
+					author: "butter_bridge",
+					votes: 0,
+					created_at: expect.any(String),
+				});
+			});
+	});
+	test("posts only username and body property even if passed an object with more properties", () => {
+		const newComment = {
+			username: "butter_bridge",
+			body: "this is my comment for the article",
+			age: 21,
+			not_valid: "kk",
+		};
+		return request(app)
+			.post("/api/articles/1/comments")
+			.send(newComment)
+			.expect(201)
+			.then(({ body }) => {
+				expect(body.comment).toMatchObject({
+					comment_id: expect.any(Number),
+					article_id: 1,
+					author: "butter_bridge",
+					votes: 0,
+					created_at: expect.any(String),
+				});
+			});
+	});
+  test("POST:400 responds with an appropriate error message when given an invalid id", () => {
+		return request(app)
+			.post("/api/articles/not-an-id/comments")
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+  test("POST:404 sends an appropriate status and error message when given a valid but non-existent id", () => {
+		return request(app)
+			.post("/api/articles/999/comments")
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("article does not exist");
 			});
 	});
 });
