@@ -231,21 +231,200 @@ describe("GET /api/articles/:article_id/comments", () => {
 			.expect(200)
 			.then(({ body }) => {
 				const { comments } = body;
-        expect(comments).toBeInstanceOf(Array);
+				expect(comments).toBeInstanceOf(Array);
 				expect(comments).toHaveLength(0);
-        expect(comments).toEqual([])
+				expect(comments).toEqual([]);
 			});
 	});
 });
 
+describe("POST /api/articles/:article_id/comments", () => {
+	test("201: responds with the newly posted comment object ", () => {
+		const newComment = {
+			username: "butter_bridge",
+			body: "this is my comment for the article",
+		};
+		return request(app)
+			.post("/api/articles/1/comments")
+			.send(newComment)
+			.expect(201)
+			.then(({ body }) => {
+				expect(body.comment).toMatchObject({
+					comment_id: expect.any(Number),
+					article_id: 1,
+					author: "butter_bridge",
+					body: "this is my comment for the article",
+					votes: 0,
+					created_at: expect.any(String),
+				});
+			});
+	});
+	test("posts only username and body property even if passed an object with more properties", () => {
+		const newComment = {
+			username: "butter_bridge",
+			body: "this is my comment for the article",
+			age: 21,
+			not_valid: "kk",
+		};
+		return request(app)
+			.post("/api/articles/1/comments")
+			.send(newComment)
+			.expect(201)
+			.then(({ body }) => {
+				expect(body.comment).toMatchObject({
+					comment_id: expect.any(Number),
+					article_id: 1,
+					author: "butter_bridge",
+					body: "this is my comment for the article",
+					votes: 0,
+					created_at: expect.any(String),
+				});
+			});
+	});
+	test("POST:400 responds with an appropriate error message when given an invalid id", () => {
+		return request(app)
+			.post("/api/articles/not-an-id/comments")
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+	test("POST:404 sends an appropriate status and error message when given a valid but non-existent id", () => {
+		return request(app)
+			.post("/api/articles/999/comments")
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("article does not exist");
+			});
+	});
+	test("POST: 400 responds with an appropriate message if passed an empty comment", () => {
+		const newComment = {
+			username: "butter_bridge",
+			body: "",
+		};
+		return request(app)
+			.post("/api/articles/1/comments")
+			.send(newComment)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("comment cannot be empty");
+			});
+	});
+	test("POST: 400 responds with an appropriate message if passed an incomplete body", () => {
+		const newComment = {
+			username: "butter_bridge",
+		};
+		return request(app)
+			.post("/api/articles/1/comments")
+			.send(newComment)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+	test("POST: 404 responds with an appropriate message if passed an incorrect username", () => {
+		const newComment = {
+			username: "aaa",
+			body: "my comment",
+		};
+		return request(app)
+			.post("/api/articles/1/comments")
+			.send(newComment)
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("User doesn't exist");
+			});
+	});
+});
 
+describe("PATCH /api/articles/:article_id", () => {
+	test("PATCH: 200 responds with the newly patched article object increasing the votes when passed a POSITIVE int", () => {
+		const patchedComment = {
+			inc_votes: 3,
+		};
 
-describe.skip('PATCH /api/articles/:article_id', () => {
-  test('200: responds with the newly patched article object', () => {
-    return request(app)
-    .patch('/api/articles/:article_id')
-    .send()
-  });
+		return request(app)
+			.patch("/api/articles/1")
+			.send(patchedComment)
+			.expect(200)
+			.then(({ body }) => {
+				const { article } = body;
+				expect(article).toMatchObject({
+					author: expect.any(String),
+					title: expect.any(String),
+					article_id: 1,
+					topic: expect.any(String),
+					created_at: expect.any(String),
+          body: expect.any(String),
+					votes: 103,
+					article_img_url: expect.any(String),
+				});
+			});
+	});
+  test("PATCH: 200 responds with the newly patched article object increasing the votes when passed a NEGATIVE int", () => {
+		const patchedComment = {
+			inc_votes: -60,
+		};
+
+		return request(app)
+			.patch("/api/articles/1")
+			.send(patchedComment)
+			.expect(200)
+			.then(({ body }) => {
+				const { article } = body;
+				expect(article).toMatchObject({
+					article_id: 1,
+					title: expect.any(String),
+					topic: expect.any(String),
+					author: expect.any(String),
+					created_at: expect.any(String),
+          body: expect.any(String),
+					votes: 40,
+					article_img_url: expect.any(String),
+				});
+			});
+	});
+	test("PATCH: 400 responds with an appropriate error message when given an invalid id", () => {
+		return request(app)
+			.patch("/api/articles/not-an-id")
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+  test("PATCH: 400 responds with an appropriate error message when given an invalid patch object e.i not a number", () => {
+    const patchComment = {
+      inc_vote: 'invalid'
+    }
+
+		return request(app)
+			.patch("/api/articles/1")
+      .send(patchComment)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+  test("PATCH: 404 sends an appropriate status and error message when given a valid but non-existent id", () => {
+		return request(app)
+			.patch("/api/articles/999")
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("article does not exist");
+			});
+	});
+  test("PATCH: 400 responds with an appropriate message if passed a wrong body property", () => {
+		const patchComment = {
+			not_a_property: 3,
+		};
+		return request(app)
+			.patch("/api/articles/1")
+			.send(patchComment)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
 });
 describe("Error handling GET", () => {
 	test("400: /api/notavalidpath", () => {
