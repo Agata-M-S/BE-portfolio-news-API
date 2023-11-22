@@ -75,6 +75,10 @@
 	"POST /api/articles/:article_id/comments": {
 		"description": "posts an object of comment based on article id returns the posted object",
 		"queries": ["article_id", "req.body"],
+    "exampleBody" : {
+      "username": "butter_bridge",
+			"body": "this is my comment for the article"
+    },
 		"exampleResponse": {
 			"newComment": {
 				"comment_id": 1,
