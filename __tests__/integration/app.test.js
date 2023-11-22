@@ -330,7 +330,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 		return request(app)
 			.post("/api/articles/1/comments")
 			.send(newComment)
-			.expect(400)
+			.expect(404)
 			.then(({ body }) => {
 				expect(body.msg).toBe("User doesn't exist");
 			});
