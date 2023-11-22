@@ -253,6 +253,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 					comment_id: expect.any(Number),
 					article_id: 1,
 					author: "butter_bridge",
+          body: "this is my comment for the article",
 					votes: 0,
 					created_at: expect.any(String),
 				});
@@ -274,6 +275,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 					comment_id: expect.any(Number),
 					article_id: 1,
 					author: "butter_bridge",
+          body: "this is my comment for the article",
 					votes: 0,
 					created_at: expect.any(String),
 				});
