@@ -10,3 +10,8 @@ exports.selectCommentsByArticleId = (article_id) => {
 		return rows;
 	});
 };
+
+
+exports.updateVotesByArticleId = () =>{
+  console.log('in the model');
+}

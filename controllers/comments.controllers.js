@@ -12,3 +12,11 @@ exports.getCommentsByArticleId = (req, res, next) => {
 		})
 		.catch(next);
 };
+
+
+
+
+
+exports.patchVotesByArticleId =(req, res, next)=>{
+  console.log('in the controller');
+}

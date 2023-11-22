@@ -238,6 +238,15 @@ describe("GET /api/articles/:article_id/comments", () => {
 	});
 });
 
+
+
+describe('PATCH /api/articles/:article_id', () => {
+  test('200: responds with the newly patched article object', () => {
+    return request(app)
+    .patch('/api/articles/:article_id')
+    .send()
+  });
+});
 describe("Error handling GET", () => {
 	test("400: /api/notavalidpath", () => {
 		return request(app)
