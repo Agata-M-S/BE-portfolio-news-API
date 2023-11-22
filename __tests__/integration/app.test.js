@@ -184,7 +184,6 @@ describe("GET /api/articles/:article_id/comments", () => {
 			.expect(200)
 			.then(({ body }) => {
 				const { comments } = body;
-				expect(comments).toBeInstanceOf(Array);
 				expect(comments).toHaveLength(2);
 				comments.forEach((comment) => {
 					expect(comment).toMatchObject({
@@ -234,6 +233,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 				const { comments } = body;
         expect(comments).toBeInstanceOf(Array);
 				expect(comments).toHaveLength(0);
+        expect(comments).toEqual([])
 			});
 	});
 });
