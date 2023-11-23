@@ -76,7 +76,7 @@ describe("GET /api/articles/:article_id", () => {
 			.get("/api/articles/1")
 			.expect(200)
 			.then(({ body }) => {
-				expect(body.article).toEqual({
+				expect(body.article).toMatchObject({
 					article_id: 1,
 					title: "Living in the shadow of a great man",
 					topic: "mitch",
@@ -290,9 +290,14 @@ describe("POST /api/articles/:article_id/comments", () => {
 			});
 	});
 	test("POST:404 sends an appropriate status and error message when given a valid but non-existent id", () => {
+    const newComment = {
+      body: "some comment",
+      username: "butter_bridge"
+    }
 		return request(app)
 			.post("/api/articles/999/comments")
 			.expect(404)
+      .send(newComment)
 			.then(({ body }) => {
 				expect(body.msg).toBe("article does not exist");
 			});
@@ -532,4 +537,14 @@ describe("queries: GET /api/articles?topics=:input", () => {
 				expect(body.msg).toBe("Not Found");
 			});
 	});
+});
+describe('feature update GET/api/articles/:article_id', () => {
+  test('200: responds with an article object that has property comment_count', () => {
+    return request(app)
+			.get("/api/articles/3")
+			.expect(200)
+			.then(({ body }) => {
+				expect(body.article).toHaveProperty('comment_count')
+			});
+  });
 });

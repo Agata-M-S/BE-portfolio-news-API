@@ -2,7 +2,6 @@ const {
 	selectArticleById,
 	selectAllArticles,
 	updateVotesByArticleId,
-  queryArticles,
 } = require("../models/articles.models");
 const { checkIfTopicExists } = require("../models/topics.models");
 
@@ -17,17 +16,16 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  const { topic } = req.query;
-  
-  checkIfTopicExists(topic)
-  .then(()=>{
-    return selectAllArticles(topic)
-  })
+	const { topic } = req.query;
+
+	checkIfTopicExists(topic)
+		.then(() => {
+			return selectAllArticles(topic);
+		})
 		.then((articles) => {
-    
 			res.status(200).send({ articles });
-		}).catch(next);
-		
+		})
+		.catch(next);
 };
 
 exports.patchVotesByArticleId = (req, res, next) => {
