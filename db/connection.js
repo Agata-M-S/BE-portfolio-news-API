@@ -14,4 +14,4 @@ if (!process.env.PGDATABASE && !process.env.DATABASE_URL) {
 	throw new Error("PGDATABASE not set DATABASE_URL not set");
 }
 
-module.exports = new Pool();
+module.exports = new Pool(config);
