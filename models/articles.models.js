@@ -28,3 +28,21 @@ exports.selectAllArticles = () => {
 		return rows;
 	});
 };
+
+exports.updateVotesByArticleId = (article, article_id, inc_votes) => {
+	if (typeof inc_votes != "number") {
+		return Promise.reject({ status: 400, msg: "Bad request" });
+	}
+
+	const updatedVotes = (article.votes += inc_votes);
+	return db
+		.query(
+			`UPDATE articles
+      SET votes = ${updatedVotes}
+      WHERE article_id = ${article_id}
+      RETURNING *`
+		)
+		.then(({ rows }) => {
+			return rows[0];
+		});
+};

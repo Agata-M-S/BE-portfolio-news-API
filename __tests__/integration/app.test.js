@@ -300,7 +300,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 	test("POST: 400 responds with an appropriate message if passed an empty comment", () => {
 		const newComment = {
 			username: "butter_bridge",
-      body: ""
+			body: "",
 		};
 		return request(app)
 			.post("/api/articles/1/comments")
@@ -310,7 +310,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 				expect(body.msg).toBe("comment cannot be empty");
 			});
 	});
-  test("POST: 400 responds with an appropriate message if passed an incomplete body", () => {
+	test("POST: 400 responds with an appropriate message if passed an incomplete body", () => {
 		const newComment = {
 			username: "butter_bridge",
 		};
@@ -322,10 +322,10 @@ describe("POST /api/articles/:article_id/comments", () => {
 				expect(body.msg).toBe("Bad request");
 			});
 	});
-  test("POST: 400 responds with an appropriate message if passed an incorrect username", () => {
+	test("POST: 404 responds with an appropriate message if passed an incorrect username", () => {
 		const newComment = {
 			username: "aaa",
-      body: "my comment"
+			body: "my comment",
 		};
 		return request(app)
 			.post("/api/articles/1/comments")
@@ -337,6 +337,95 @@ describe("POST /api/articles/:article_id/comments", () => {
 	});
 });
 
+describe("PATCH /api/articles/:article_id", () => {
+	test("PATCH: 200 responds with the newly patched article object increasing the votes when passed a POSITIVE int", () => {
+		const patchedComment = {
+			inc_votes: 3,
+		};
+
+		return request(app)
+			.patch("/api/articles/1")
+			.send(patchedComment)
+			.expect(200)
+			.then(({ body }) => {
+				const { article } = body;
+				expect(article).toMatchObject({
+					author: expect.any(String),
+					title: expect.any(String),
+					article_id: 1,
+					topic: expect.any(String),
+					created_at: expect.any(String),
+          body: expect.any(String),
+					votes: 103,
+					article_img_url: expect.any(String),
+				});
+			});
+	});
+  test("PATCH: 200 responds with the newly patched article object increasing the votes when passed a NEGATIVE int", () => {
+		const patchedComment = {
+			inc_votes: -60,
+		};
+
+		return request(app)
+			.patch("/api/articles/1")
+			.send(patchedComment)
+			.expect(200)
+			.then(({ body }) => {
+				const { article } = body;
+				expect(article).toMatchObject({
+					article_id: 1,
+					title: expect.any(String),
+					topic: expect.any(String),
+					author: expect.any(String),
+					created_at: expect.any(String),
+          body: expect.any(String),
+					votes: 40,
+					article_img_url: expect.any(String),
+				});
+			});
+	});
+	test("PATCH: 400 responds with an appropriate error message when given an invalid id", () => {
+		return request(app)
+			.patch("/api/articles/not-an-id")
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+  test("PATCH: 400 responds with an appropriate error message when given an invalid patch object e.i not a number", () => {
+    const patchComment = {
+      inc_vote: 'invalid'
+    }
+
+		return request(app)
+			.patch("/api/articles/1")
+      .send(patchComment)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+  test("PATCH: 404 sends an appropriate status and error message when given a valid but non-existent id", () => {
+		return request(app)
+			.patch("/api/articles/999")
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("article does not exist");
+			});
+	});
+  test("PATCH: 400 responds with an appropriate message if not passed inc_votes property", () => {
+		const patchComment = {
+			not_a_property: 3,
+		};
+		return request(app)
+			.patch("/api/articles/1")
+			.send(patchComment)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+});
 describe("Error handling GET", () => {
 	test("400: /api/notavalidpath", () => {
 		return request(app)

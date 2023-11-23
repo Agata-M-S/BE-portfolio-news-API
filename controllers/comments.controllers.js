@@ -24,7 +24,7 @@ exports.postCommentsByArticleId = (req, res, next) => {
 		insertCommentsByArticleId(article_id, insert),
 	])
 		.then((returnPromiseArray) => {
-      const newComment = returnPromiseArray[1]
+			const newComment = returnPromiseArray[1];
 			res.status(201).send({ comment: newComment });
 		})
 		.catch(next);
