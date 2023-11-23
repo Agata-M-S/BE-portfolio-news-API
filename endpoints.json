@@ -108,6 +108,12 @@
 			}
 		}
 	},
+	"DELETE /api/comments/:comment_id": {
+		"description": "removes the comment specified by comment_id",
+		"queries": [],
+		"exampleResponse": "no response body"
+	},
+
 	"GET /api/users": {
 		"description": "serves an array of all users",
 		"queries": [],

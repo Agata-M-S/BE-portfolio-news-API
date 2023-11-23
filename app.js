@@ -13,11 +13,10 @@ const {
 const {
 	getCommentsByArticleId,
 	postCommentsByArticleId,
+	deleteCommentById,
 } = require("./controllers/comments.controllers");
 const { getAllUsers } = require("./controllers/users.controllers");
 const app = express();
-
-patchVotesByArticleId;
 
 app.use(express.json());
 
@@ -34,6 +33,8 @@ app.get('/api/users', getAllUsers)
 app.post("/api/articles/:article_id/comments", postCommentsByArticleId);
 
 app.patch("/api/articles/:article_id", patchVotesByArticleId);
+
+app.delete("/api/comments/:comment_id", deleteCommentById);
 
 app.all("*", (req, res) => {
 	res.status(404).send({ msg: "path does not exist" });

@@ -63,7 +63,7 @@ describe("GET /api returns an object with a description of all other avaliable e
 					expect(value).toMatchObject({
 						description: expect.any(String),
 						queries: expect.any(Array),
-						exampleResponse: expect.any(Object),
+						exampleResponse: expect.anything(),
 					});
 				}
 			});
@@ -355,13 +355,13 @@ describe("PATCH /api/articles/:article_id", () => {
 					article_id: 1,
 					topic: expect.any(String),
 					created_at: expect.any(String),
-          body: expect.any(String),
+					body: expect.any(String),
 					votes: 103,
 					article_img_url: expect.any(String),
 				});
 			});
 	});
-  test("PATCH: 200 responds with the newly patched article object increasing the votes when passed a NEGATIVE int", () => {
+	test("PATCH: 200 responds with the newly patched article object increasing the votes when passed a NEGATIVE int", () => {
 		const patchedComment = {
 			inc_votes: -60,
 		};
@@ -378,7 +378,7 @@ describe("PATCH /api/articles/:article_id", () => {
 					topic: expect.any(String),
 					author: expect.any(String),
 					created_at: expect.any(String),
-          body: expect.any(String),
+					body: expect.any(String),
 					votes: 40,
 					article_img_url: expect.any(String),
 				});
@@ -392,20 +392,20 @@ describe("PATCH /api/articles/:article_id", () => {
 				expect(body.msg).toBe("Bad request");
 			});
 	});
-  test("PATCH: 400 responds with an appropriate error message when given an invalid patch object e.i not a number", () => {
-    const patchComment = {
-      inc_vote: 'invalid'
-    }
+	test("PATCH: 400 responds with an appropriate error message when given an invalid patch object e.i not a number", () => {
+		const patchComment = {
+			inc_vote: "invalid",
+		};
 
 		return request(app)
 			.patch("/api/articles/1")
-      .send(patchComment)
+			.send(patchComment)
 			.expect(400)
 			.then(({ body }) => {
 				expect(body.msg).toBe("Bad request");
 			});
 	});
-  test("PATCH: 404 sends an appropriate status and error message when given a valid but non-existent id", () => {
+	test("PATCH: 404 sends an appropriate status and error message when given a valid but non-existent id", () => {
 		return request(app)
 			.patch("/api/articles/999")
 			.expect(404)
@@ -413,7 +413,7 @@ describe("PATCH /api/articles/:article_id", () => {
 				expect(body.msg).toBe("article does not exist");
 			});
 	});
-  test("PATCH: 400 responds with an appropriate message if not passed inc_votes property", () => {
+	test("PATCH: 400 responds with an appropriate message if not passed inc_votes property", () => {
 		const patchComment = {
 			not_a_property: 3,
 		};
@@ -426,6 +426,31 @@ describe("PATCH /api/articles/:article_id", () => {
 			});
 	});
 });
+describe("DELETE /api/comments/:comment_id", () => {
+	test("204: responds with status code 204", () => {
+		return request(app)
+    .delete("/api/comments/1")
+    .expect(204)
+    
+	});
+  test("DELETE: 404 sends an appropriate status and error message when given a valid but non-existent id", () => {
+		return request(app)
+			.delete("/api/comments/999")
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("comment does not exist");
+			});
+	});
+  test("DELETE: 400 responds with an appropriate error message when given an invalid id", () => {
+		return request(app)
+			.delete("/api/comments/not-a-valid-id")
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+});
+
 describe("Error handling GET", () => {
 	test("400: /api/notavalidpath", () => {
 		return request(app)
