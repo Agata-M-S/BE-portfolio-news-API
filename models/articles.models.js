@@ -11,7 +11,7 @@ exports.selectArticleById = (article_id) => {
 	});
 };
 
-exports.selectAllArticles = () => {
+exports.selectAllArticles = (topic) => {
 	const articlesTabColumns =
 		"title, articles.author, articles.article_id, topic, articles.created_at, article_img_url, articles.votes ";
 	const commentsTabColumns = `COUNT(comments.comment_id) AS comment_count `;
@@ -21,10 +21,14 @@ exports.selectAllArticles = () => {
 	const sortBy = `ORDER BY articles.created_at DESC`;
 
 	let queryStr = `SELECT ${articlesTabColumns}, ${commentsTabColumns} FROM articles LEFT JOIN comments
-  ON articles.article_id = comments.article_id 
-  ${groupBy} ${sortBy}`;
+  ON articles.article_id = comments.article_id `;
+	let queryValues = [];
+	if (topic) {
+		queryValues.push(topic);
+		queryStr += "WHERE topic = $1";
+	}
 
-	return db.query(queryStr).then(({ rows }) => {
+	return db.query(queryStr + groupBy + sortBy, queryValues).then(({ rows }) => {
 		return rows;
 	});
 };
