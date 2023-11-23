@@ -5,29 +5,38 @@ const {
 	getAllEndpoints,
 } = require("./controllers/topics.controllers");
 const { serverError, handlePsqlError, handleCustomErorr } = require("./errors");
-const { getArticleById, getAllArticles } = require("./controllers/articles.controllers");
-const { getCommentsByArticleId, postCommentsByArticleId, patchVotesByArticleId } = require("./controllers/comments.controllers");
+const {
+	getArticleById,
+	getAllArticles,
+	patchVotesByArticleId,
+} = require("./controllers/articles.controllers");
+const {
+	getCommentsByArticleId,
+	postCommentsByArticleId,
+} = require("./controllers/comments.controllers");
 const app = express();
 
-app.use(express.json())
+patchVotesByArticleId;
+
+app.use(express.json());
 
 app.get("/api/servercheck", runServerCheck);
 app.get("/api/topics", getTopics);
 
-app.get("/api/articles/:article_id", getArticleById)
-app.get('/api/articles', getAllArticles)
+app.get("/api/articles/:article_id", getArticleById);
+app.get("/api/articles", getAllArticles);
 app.get("/api", getAllEndpoints);
-app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
+app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
-app.post('/api/articles/:article_id/comments', postCommentsByArticleId)
+app.post("/api/articles/:article_id/comments", postCommentsByArticleId);
 
-app.patch('/api/articles/:article_id', patchVotesByArticleId)
+app.patch("/api/articles/:article_id", patchVotesByArticleId);
 
 app.all("*", (req, res) => {
 	res.status(404).send({ msg: "path does not exist" });
 });
 
 app.use(handlePsqlError);
-app.use(handleCustomErorr)
+app.use(handleCustomErorr);
 app.use(serverError);
 module.exports = app;
