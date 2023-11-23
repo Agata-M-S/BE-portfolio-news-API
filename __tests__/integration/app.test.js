@@ -428,12 +428,9 @@ describe("PATCH /api/articles/:article_id", () => {
 });
 describe("DELETE /api/comments/:comment_id", () => {
 	test("204: responds with status code 204", () => {
-		return request(app)
-    .delete("/api/comments/1")
-    .expect(204)
-    
+		return request(app).delete("/api/comments/1").expect(204);
 	});
-  test("DELETE: 404 sends an appropriate status and error message when given a valid but non-existent id", () => {
+	test("DELETE: 404 sends an appropriate status and error message when given a valid but non-existent id", () => {
 		return request(app)
 			.delete("/api/comments/999")
 			.expect(404)
@@ -441,7 +438,7 @@ describe("DELETE /api/comments/:comment_id", () => {
 				expect(body.msg).toBe("comment does not exist");
 			});
 	});
-  test("DELETE: 400 responds with an appropriate error message when given an invalid id", () => {
+	test("DELETE: 400 responds with an appropriate error message when given an invalid id", () => {
 		return request(app)
 			.delete("/api/comments/not-a-valid-id")
 			.expect(400)
@@ -462,22 +459,77 @@ describe("Error handling GET", () => {
 	});
 });
 
-describe('GET /api/users', () => {
-  test('200: responds with an array of users, each user object in the array should have properties: username, name, avatar_url', () => {
-    return request(app)
-    .get('/api/users')
-    .expect(200)
-    .then(({body}) =>{
-      const {users} = body
+describe("GET /api/users", () => {
+	test("200: responds with an array of users, each user object in the array should have properties: username, name, avatar_url", () => {
+		return request(app)
+			.get("/api/users")
+			.expect(200)
+			.then(({ body }) => {
+				const { users } = body;
 
-      expect(users).toHaveLength(4);
+				expect(users).toHaveLength(4);
 				users.forEach((article) => {
 					expect(article).toMatchObject({
-					username: expect.any(String),
-          name: expect.any(String),
-          avatar_url: expect.any(String)
+						username: expect.any(String),
+						name: expect.any(String),
+						avatar_url: expect.any(String),
 					});
 				});
-    })
-  });
+			});
+	});
+});
+describe("queries: GET /api/articles?topics=:input", () => {
+	test("200: responds with an array of filtered articles specified by the query", () => {
+		return request(app)
+			.get("/api/articles/?topic=mitch")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles).toHaveLength(12);
+				articles.forEach((article) => {
+					expect(article).toMatchObject({
+						author: expect.any(String),
+						title: expect.any(String),
+						article_id: expect.any(Number),
+						topic: "mitch",
+						created_at: expect.any(String),
+						votes: expect.any(Number),
+						article_img_url: expect.any(String),
+						comment_count: expect.any(String),
+					});
+				});
+			});
+	});
+	test("filtered article objects in the array should be sorted by date in descending order by default", () => {
+		return request(app)
+			.get("/api/articles/?topic=mitch")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles).toBeSortedBy("created_at", {
+					descending: true,
+				});
+			});
+	});
+	test("200: responds with an empty array if topic is valid but there are no articles", () => {
+		return request(app)
+			.get("/api/articles?topic=paper")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toBeInstanceOf(Array);
+				expect(articles).toHaveLength(0);
+				expect(articles).toEqual([]);
+			});
+	});
+	test("404: responds with an appropriate message if topic doesn't exist", () => {
+		return request(app)
+			.get("/api/articles/?topic=dogs")
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Not Found");
+			});
+	});
 });
