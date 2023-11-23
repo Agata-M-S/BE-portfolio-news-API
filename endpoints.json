@@ -75,10 +75,10 @@
 	"POST /api/articles/:article_id/comments": {
 		"description": "posts an object of comment based on article id returns the posted object",
 		"queries": ["article_id", "req.body"],
-    "exampleBody" : {
-      "username": "butter_bridge",
+		"exampleBody": {
+			"username": "butter_bridge",
 			"body": "this is my comment for the article"
-    },
+		},
 		"exampleResponse": {
 			"newComment": {
 				"comment_id": 1,
@@ -89,13 +89,13 @@
 			}
 		}
 	},
-  "PATCH /api/articles/:article_id" :{
-    "description": "updates votes property of the given article based on article_id and returns updated article object",
+	"PATCH /api/articles/:article_id": {
+		"description": "updates votes property of the given article based on article_id and returns updated article object",
 		"queries": [],
-    "exampleBody" : {
-      "inc_votes": 9
-    },
-    "exampleResponse": {
+		"exampleBody": {
+			"inc_votes": 9
+		},
+		"exampleResponse": {
 			"article": {
 				"article_id": 1,
 				"title": "Living in the shadow of a great man",
@@ -107,5 +107,10 @@
 				"article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
 			}
 		}
-  }
+	},
+	"DELETE /api/comments/:comment_id": {
+		"description": "removes the comment specified by comment_id",
+		"queries": [],
+		"exampleResponse": "no response body"
+	}
 }
