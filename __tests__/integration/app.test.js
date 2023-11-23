@@ -413,7 +413,7 @@ describe("PATCH /api/articles/:article_id", () => {
 				expect(body.msg).toBe("article does not exist");
 			});
 	});
-  test("PATCH: 400 responds with an appropriate message if passed a wrong body property", () => {
+  test("PATCH: 400 responds with an appropriate message if not passed inc_votes property", () => {
 		const patchComment = {
 			not_a_property: 3,
 		};

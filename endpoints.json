@@ -92,7 +92,6 @@
   "PATCH /api/articles/:article_id" :{
     "description": "updates votes property of the given article based on article_id and returns updated article object",
 		"queries": [],
-    "params": ["article_id", "req.body"],
     "exampleBody" : {
       "inc_votes": 9
     },
