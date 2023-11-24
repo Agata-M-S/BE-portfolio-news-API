@@ -36,9 +36,9 @@ exports.selectCommentById = (comment_id) => {
 			[comment_id]
 		)
 		.then(({ rows }) => {
-      if (!rows.length) {
-        return Promise.reject({ status: 404, msg: "comment does not exist" });
-      }
+			if (!rows.length) {
+				return Promise.reject({ status: 404, msg: "comment does not exist" });
+			}
 			return rows[0];
 		});
 };
@@ -53,4 +53,20 @@ exports.removeCommentById = (comment_id) => {
 		.then(() => {
 			console.log("comment was sucessfully removed");
 		});
+};
+
+exports.updateCommentVotesByCommentId = (selectedComment, comment_id, inc_votes) => {
+	if (typeof inc_votes != "number") {
+		return Promise.reject({ status: 400, msg: "Bad request" });
+	}
+  const updatedVotes = (selectedComment.votes += inc_votes)
+
+  return db.query(`
+  UPDATE comments
+  SET votes = ${updatedVotes}
+  WHERE comment_id = ${comment_id}
+  RETURNING *`)
+  .then(({ rows }) => {
+    return rows[0];
+  });
 };
