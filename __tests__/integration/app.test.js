@@ -561,15 +561,15 @@ describe("queries GET api/articles?sort_by=:input&order=ASC/DESC", () => {
 				});
 			});
 	});
-  test('400: responds with an error message when passed invalid sort_by query (column name)', () => {
-    return request(app)
+	test("400: responds with an error message when passed invalid sort_by query (column name)", () => {
+		return request(app)
 			.get("/api/articles?sort_by=cats")
 			.expect(400)
 			.then(({ body }) => {
-        expect(body.msg).toBe("Bad request")
-      })
-  });
-  test("200: responds with an array of article objects sorted by any valid column in ASCENDING order ", () => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+	test("200: responds with an array of article objects sorted by any valid column in ASCENDING order ", () => {
 		return request(app)
 			.get("/api/articles?sort_by=votes&order=ASC")
 			.expect(200)
@@ -581,7 +581,7 @@ describe("queries GET api/articles?sort_by=:input&order=ASC/DESC", () => {
 				});
 			});
 	});
-  test("200: responds with an array of article objects sorted by created_at if not passed a sort_by query in ASCENDING order ", () => {
+	test("200: responds with an array of article objects sorted by created_at if not passed a sort_by query in ASCENDING order ", () => {
 		return request(app)
 			.get("/api/articles?order=ASC")
 			.expect(200)
@@ -591,6 +591,28 @@ describe("queries GET api/articles?sort_by=:input&order=ASC/DESC", () => {
 				expect(articles).toBeSortedBy("created_at", {
 					descending: false,
 				});
+			});
+	});
+});
+describe("GET /api/users/:username", () => {
+	test("200: responds with a correct user object", () => {
+		return request(app)
+			.get("/api/users/butter_bridge")
+			.expect(200)
+			.then(({ body }) => {
+				expect(body.user).toMatchObject({
+					username: "butter_bridge",
+					name: expect.any(String),
+					avatar_url: expect.any(String),
+				});
+			});
+	});
+	test("404: responds with an appropriate message when username not found", () => {
+		return request(app)
+			.get("/api/users/no_such_user")
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Username Not Found");
 			});
 	});
 });
