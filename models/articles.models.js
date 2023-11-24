@@ -83,3 +83,35 @@ exports.updateVotesByArticleId = (article, article_id, inc_votes) => {
 			return rows[0];
 		});
 };
+
+exports.insertArticle = (insert) => {
+	const { author, body, title, topic, article_img_url } = insert;
+  const insertsArray = [author, body, title, topic, article_img_url]
+  let queryStr = `INSERT INTO articles `
+
+  if(!body){
+    return Promise.reject({status: 400, msg: "Article cannot be empty"})
+  }
+  if(!author){
+    return Promise.reject({status: 400, msg: "Author cannot be empty"})
+  }
+
+  if(!article_img_url){
+    insertsArray.pop()
+    queryStr += `(author, body, title, topic)
+      VALUES ($1, $2, $3, $4)  
+      RETURNING article_id`
+  }
+
+  else {
+    queryStr += `(author, body, title, topic, article_img_url)
+      VALUES ($1, $2, $3, $4, $5)  
+      RETURNING article_id`
+  }
+
+	return db
+		.query(queryStr, insertsArray)
+		.then(({ rows }) => {
+			return rows[0]
+		});
+};

@@ -11,11 +11,11 @@ const usersRouter = require("./users-router");
 
 const apiRouter = require("express").Router();
 
-apiRouter.get("/articles", getAllArticles);
+// apiRouter.get("/articles", getAllArticles);
 apiRouter.get("/", getAllEndpoints);
 apiRouter.get("/servercheck", runServerCheck);
 apiRouter.get("/topics", getTopics);
-apiRouter.get("/users", getAllUsers);
+// apiRouter.get("/users", getAllUsers);
 
 apiRouter.use("/comments", commentsRouter);
 apiRouter.use("/articles", articlesRouter);
