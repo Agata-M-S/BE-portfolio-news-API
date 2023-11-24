@@ -693,3 +693,116 @@ describe("PATCH /api/comments/:comment_id", () => {
 			});
 	});
 });
+describe("POST /api/articles", () => {
+	test("201: responds with the newly posted article object with correct properties", () => {
+		const newArticle = {
+			author: "butter_bridge",
+			title: "title for the article",
+			topic: "cats",
+			body: "this is my article",
+		};
+		return request(app)
+			.post("/api/articles")
+			.send(newArticle)
+			.expect(201)
+			.then(({ body }) => {
+				expect(body.article).toMatchObject({
+					article_id: expect.any(Number),
+					author: expect.any(String),
+					title: expect.any(String),
+					topic: expect.any(String),
+					body: expect.any(String),
+					votes: 0,
+					created_at: expect.any(String),
+					article_img_url: expect.any(String),
+					comment_count: expect.any(String),
+				});
+			});
+	});
+	test("posts only accepted properties, even if passed in more properties ", () => {
+		const newArticle = {
+			author: "butter_bridge",
+			title: "title for the article",
+			topic: "cats",
+			body: "this is my article",
+			notReal: "does not exist",
+			article_img_url: "some link here",
+		};
+		return request(app)
+			.post("/api/articles")
+			.send(newArticle)
+			.expect(201)
+			.then(({ body }) => {
+				expect(body.article).toMatchObject({
+					article_id: expect.any(Number),
+					author: expect.any(String),
+					title: expect.any(String),
+					topic: expect.any(String),
+					body: expect.any(String),
+					votes: 0,
+					created_at: expect.any(String),
+					article_img_url: expect.any(String),
+					comment_count: expect.any(String),
+				});
+			});
+	});
+	test("POST: 400 responds with an appropriate message if passed an incomplete body", () => {
+		const newArticle = {
+			author: "butter_bridge",
+			topic: "cats",
+			body: "this is my article",
+		};
+		return request(app)
+			.post("/api/articles")
+			.send(newArticle)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Bad request");
+			});
+	});
+	test("POST: 400 responds with an appropriate message if passed an empty article body or not provided body property", () => {
+		const newArticle = {
+			author: "butter_bridge",
+			topic: "cats",
+			body: "",
+      title: "sss"
+		};
+		return request(app)
+			.post("/api/articles")
+			.send(newArticle)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Article cannot be empty");
+			});
+	});
+	test("POST: 404 responds with an appropriate message if passed an invalid topic (non existent)", () => {
+		const newArticle = {
+			author: "butter_bridge",
+			topic: "dogs",
+			body: "article about dogs",
+      title: "dogs are better than cats"
+		};
+		return request(app)
+			.post("/api/articles")
+			.send(newArticle)
+			.expect(404)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Topic doesn't exist");
+			});
+	});
+  test("POST: 400 responds with an appropriate message if not provided author property or passed in an empty author str", () => {
+		const newArticle = {
+			author: "",
+			topic: "cats",
+			body: "article about dogs",
+      title: "dogs are better than cats"
+		};
+		return request(app)
+			.post("/api/articles")
+			.send(newArticle)
+			.expect(400)
+			.then(({ body }) => {
+				expect(body.msg).toBe("Author cannot be empty");
+			});
+	});
+});
