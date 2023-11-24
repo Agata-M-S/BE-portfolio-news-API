@@ -50,7 +50,7 @@
 				"created_at": "2020-07-09T20:11:00.000Z",
 				"votes": 100,
 				"article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-        "comment_count": 5
+				"comment_count": 5
 			}
 		}
 	},
@@ -127,7 +127,7 @@
 			]
 		}
 	},
-  "GET /api/articles?topic=:input&sort_by=:input&order=ASC": {
+	"GET /api/articles?topic=:input&sort_by=:input&order=ASC": {
 		"description": "serves an array of all articles filtered by topic, sorted by given column in ascending order",
 		"queries": ["topic", "sort_by", "order"],
 		"exampleResponse": {
@@ -143,15 +143,30 @@
 			]
 		}
 	},
-  "GET /api/users/:username": {
+	"GET /api/users/:username": {
 		"description": "serves a user object specified by the username",
 		"queries": [],
 		"exampleResponse": {
 			"user": {
-					"username": "butter_bridge",
-					"name": "jonny",
-					"avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
-				}
+				"username": "butter_bridge",
+				"name": "jonny",
+				"avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+			}
+		}
+	},
+	"PATCH /api/comments/:comment_id": {
+		"description": "updates votes property of the given comment based on comment_id and returns updated comment object",
+		"queries": [],
+		"exampleBody": {
+			"inc_votes": 9
+		},
+		"exampleResponse": {
+			"comment_id": 1,
+			"author": "butter_bridge",
+			"article_id": 3,
+			"created_at": "2018-05-30T15:59:13.341Z",
+			"body": "I find this existence challenging",
+			"votes": 13
 		}
 	}
 }

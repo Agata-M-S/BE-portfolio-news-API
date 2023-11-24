@@ -4,6 +4,7 @@ const {
 	insertCommentsByArticleId,
 	removeCommentById,
 	selectCommentById,
+	updateCommentVotesByCommentId,
 } = require("../models/comments.models");
 
 exports.getCommentsByArticleId = (req, res, next) => {
@@ -35,11 +36,25 @@ exports.postCommentsByArticleId = (req, res, next) => {
 exports.deleteCommentById = (req, res, next) => {
 	const { comment_id } = req.params;
 
-  selectCommentById(comment_id).then(()=>{
-    removeCommentById(comment_id)
-  })
+	selectCommentById(comment_id)
+		.then(() => {
+			removeCommentById(comment_id);
+		})
 		.then(() => {
 			res.status(204).send({ msg: "successfully removed" });
 		})
 		.catch(next);
+};
+
+exports.patchCommentVotesByCommentId = (req, res, next) => {
+	const { comment_id } = req.params;
+	const { inc_votes } = req.body;
+	return selectCommentById(comment_id)
+		.then((selectedComment) =>
+			updateCommentVotesByCommentId(selectedComment, comment_id, inc_votes)
+		)
+		.then((updatedComment) => {
+			res.status(200).send({ comment: updatedComment });
+		})
+    .catch(next)
 };
