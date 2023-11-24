@@ -290,14 +290,14 @@ describe("POST /api/articles/:article_id/comments", () => {
 			});
 	});
 	test("POST:404 sends an appropriate status and error message when given a valid but non-existent id", () => {
-    const newComment = {
-      body: "some comment",
-      username: "butter_bridge"
-    }
+		const newComment = {
+			body: "some comment",
+			username: "butter_bridge",
+		};
 		return request(app)
 			.post("/api/articles/999/comments")
 			.expect(404)
-      .send(newComment)
+			.send(newComment)
 			.then(({ body }) => {
 				expect(body.msg).toBe("article does not exist");
 			});
@@ -538,13 +538,59 @@ describe("queries: GET /api/articles?topics=:input", () => {
 			});
 	});
 });
-describe('feature update GET/api/articles/:article_id', () => {
-  test('200: responds with an article object that has property comment_count', () => {
-    return request(app)
+describe("feature update GET/api/articles/:article_id", () => {
+	test("200: responds with an article object that has property comment_count", () => {
+		return request(app)
 			.get("/api/articles/3")
 			.expect(200)
 			.then(({ body }) => {
-				expect(body.article).toHaveProperty('comment_count')
+				expect(body.article).toHaveProperty("comment_count");
 			});
+	});
+});
+describe("queries GET api/articles?sort_by=:input&order=ASC/DESC", () => {
+	test("200: responds with an array of article objects sorted by any valid column in DESCENDING order (by default)", () => {
+		return request(app)
+			.get("/api/articles?sort_by=topic")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles).toBeSortedBy("topic", {
+					descending: true,
+				});
+			});
+	});
+  test('400: responds with an error message when passed invalid sort_by query (column name)', () => {
+    return request(app)
+			.get("/api/articles?sort_by=cats")
+			.expect(400)
+			.then(({ body }) => {
+        expect(body.msg).toBe("Bad request")
+      })
   });
+  test("200: responds with an array of article objects sorted by any valid column in ASCENDING order ", () => {
+		return request(app)
+			.get("/api/articles?sort_by=votes&order=ASC")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles).toBeSortedBy("votes", {
+					descending: false,
+				});
+			});
+	});
+  test("200: responds with an array of article objects sorted by created_at if not passed a sort_by query in ASCENDING order ", () => {
+		return request(app)
+			.get("/api/articles?order=ASC")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+
+				expect(articles).toBeSortedBy("created_at", {
+					descending: false,
+				});
+			});
+	});
 });

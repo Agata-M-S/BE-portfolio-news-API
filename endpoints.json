@@ -127,9 +127,9 @@
 			]
 		}
 	},
-  "GET /api/articles?topic=:input": {
-		"description": "serves an array of all articles filtered by topic",
-		"queries": ["topic"],
+  "GET /api/articles?topic=:input&sort_by=:input&order=ASC": {
+		"description": "serves an array of all articles filtered by topic, sorted by given column in ascending order",
+		"queries": ["topic", "sort_by", "order"],
 		"exampleResponse": {
 			"articles": [
 				{
