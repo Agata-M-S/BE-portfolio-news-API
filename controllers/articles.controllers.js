@@ -5,6 +5,7 @@ const {
 	insertArticle,
 } = require("../models/articles.models");
 const { checkIfTopicExists } = require("../models/topics.models");
+const { paginate } = require("../utils");
 
 exports.getArticleById = (req, res, next) => {
 	const { article_id } = req.params;
@@ -17,13 +18,14 @@ exports.getArticleById = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-	const { topic, sort_by, order } = req.query;
+	const { topic, sort_by, order, page, limit } = req.query;
 
 	checkIfTopicExists(topic)
 		.then(() => {
-			return selectAllArticles(topic, sort_by, order);
+			return selectAllArticles(topic, sort_by, order, page, limit);
 		})
 		.then((articles) => {
+      
 			res.status(200).send({ articles });
 		})
 		.catch(next);
@@ -47,5 +49,5 @@ exports.postArticle = (req, res, next) => {
 		.then((article) => {
 			res.status(201).send({ article });
 		})
-    .catch(next)
+		.catch(next);
 };

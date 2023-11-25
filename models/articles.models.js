@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { paginate } = require("../utils");
 
 exports.selectArticleById = (article_id) => {
 	const articlesTabColumns =
@@ -17,7 +18,7 @@ exports.selectArticleById = (article_id) => {
 	});
 };
 
-exports.selectAllArticles = (topic, sort_by, order) => {
+exports.selectAllArticles = (topic, sort_by, order, page, limit) => {
 	const validSortBy = [
 		"title",
 		"author",
@@ -38,9 +39,9 @@ exports.selectAllArticles = (topic, sort_by, order) => {
 	const commentsTabColumns = `COUNT(comments.comment_id) AS comment_count `;
 
 	const groupBy = `GROUP BY articles.article_id `;
-	let orderBy = "DESC";
-	let sortBy = `ORDER BY articles.created_at `;
 
+	let orderBy = "DESC ";
+	let sortBy = `ORDER BY articles.created_at `;
 	let queryStr = `SELECT ${articlesTabColumns}, ${commentsTabColumns} FROM articles LEFT JOIN comments
   ON articles.article_id = comments.article_id `;
 
@@ -61,9 +62,13 @@ exports.selectAllArticles = (topic, sort_by, order) => {
 
 	queryStr += groupBy + sortBy + orderBy;
 
-	return db.query(queryStr, queryValues).then(({ rows }) => {
-		return rows;
-	});
+	return Promise.all([paginate(queryStr, page, limit), queryValues])
+		.then((resolvedPromise) => {
+			return db.query(resolvedPromise[0], resolvedPromise[1]);
+		})
+		.then(({ rows }) => {
+			return rows;
+		});
 };
 
 exports.updateVotesByArticleId = (article, article_id, inc_votes) => {
@@ -86,32 +91,28 @@ exports.updateVotesByArticleId = (article, article_id, inc_votes) => {
 
 exports.insertArticle = (insert) => {
 	const { author, body, title, topic, article_img_url } = insert;
-  const insertsArray = [author, body, title, topic, article_img_url]
-  let queryStr = `INSERT INTO articles `
+	const insertsArray = [author, body, title, topic, article_img_url];
+	let queryStr = `INSERT INTO articles `;
 
-  if(!body){
-    return Promise.reject({status: 400, msg: "Article cannot be empty"})
-  }
-  if(!author){
-    return Promise.reject({status: 400, msg: "Author cannot be empty"})
-  }
+	if (!body) {
+		return Promise.reject({ status: 400, msg: "Article cannot be empty" });
+	}
+	if (!author) {
+		return Promise.reject({ status: 400, msg: "Author cannot be empty" });
+	}
 
-  if(!article_img_url){
-    insertsArray.pop()
-    queryStr += `(author, body, title, topic)
+	if (!article_img_url) {
+		insertsArray.pop();
+		queryStr += `(author, body, title, topic)
       VALUES ($1, $2, $3, $4)  
-      RETURNING article_id`
-  }
-
-  else {
-    queryStr += `(author, body, title, topic, article_img_url)
+      RETURNING article_id`;
+	} else {
+		queryStr += `(author, body, title, topic, article_img_url)
       VALUES ($1, $2, $3, $4, $5)  
-      RETURNING article_id`
-  }
+      RETURNING article_id`;
+	}
 
-	return db
-		.query(queryStr, insertsArray)
-		.then(({ rows }) => {
-			return rows[0]
-		});
+	return db.query(queryStr, insertsArray).then(({ rows }) => {
+		return rows[0];
+	});
 };

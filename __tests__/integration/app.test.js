@@ -134,7 +134,7 @@ describe("GET /api/articles", () => {
 			.then(({ body }) => {
 				const { articles } = body;
 
-				expect(articles).toHaveLength(13);
+				expect(articles).toHaveLength(10);
 				articles.forEach((article) => {
 					expect(article).toMatchObject({
 						author: expect.any(String),
@@ -169,7 +169,7 @@ describe("GET /api/articles", () => {
 			.then(({ body }) => {
 				const { articles } = body;
 
-				expect(articles).toHaveLength(13);
+				expect(articles).toHaveLength(10);
 				articles.forEach((article) => {
 					expect(article).not.toHaveProperty("body");
 				});
@@ -491,7 +491,7 @@ describe("queries: GET /api/articles?topics=:input", () => {
 			.then(({ body }) => {
 				const { articles } = body;
 
-				expect(articles).toHaveLength(12);
+				expect(articles).toHaveLength(10);
 				articles.forEach((article) => {
 					expect(article).toMatchObject({
 						author: expect.any(String),
@@ -765,7 +765,7 @@ describe("POST /api/articles", () => {
 			author: "butter_bridge",
 			topic: "cats",
 			body: "",
-      title: "sss"
+			title: "sss",
 		};
 		return request(app)
 			.post("/api/articles")
@@ -780,7 +780,7 @@ describe("POST /api/articles", () => {
 			author: "butter_bridge",
 			topic: "dogs",
 			body: "article about dogs",
-      title: "dogs are better than cats"
+			title: "dogs are better than cats",
 		};
 		return request(app)
 			.post("/api/articles")
@@ -790,12 +790,12 @@ describe("POST /api/articles", () => {
 				expect(body.msg).toBe("Topic doesn't exist");
 			});
 	});
-  test("POST: 400 responds with an appropriate message if not provided author property or passed in an empty author str", () => {
+	test("POST: 400 responds with an appropriate message if not provided author property or passed in an empty author str", () => {
 		const newArticle = {
 			author: "",
 			topic: "cats",
 			body: "article about dogs",
-      title: "dogs are better than cats"
+			title: "dogs are better than cats",
 		};
 		return request(app)
 			.post("/api/articles")
@@ -803,6 +803,45 @@ describe("POST /api/articles", () => {
 			.expect(400)
 			.then(({ body }) => {
 				expect(body.msg).toBe("Author cannot be empty");
+			});
+	});
+});
+
+describe("GET /api/articles pagination", () => {
+	test("200: responds with an array of paginated articles limited to 10", () => {
+		return request(app)
+			.get("/api/articles?page=1")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toHaveLength(10);
+			});
+	});
+	test("200: responds with an array of paginated articles limited to specified limit (13)", () => {
+		return request(app)
+			.get("/api/articles?limit=13&page=1")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toHaveLength(13);
+			});
+	});
+  test("200: responds with an array of correct amount of paginated articles on the last page", () => {
+		return request(app)
+			.get("/api/articles?page=2")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toHaveLength(3);
+			});
+	});
+  test("200: responds with an array of paginated articles limited to 10 even if provided invalid page or limit input e.i not a number", () => {
+		return request(app)
+			.get("/api/articles?limit=not-a-num&page=not-a-number")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toHaveLength(10);
 			});
 	});
 });
