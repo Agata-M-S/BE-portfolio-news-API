@@ -9,12 +9,13 @@ const {
 
 exports.getCommentsByArticleId = (req, res, next) => {
 	const { article_id } = req.params;
-
+	const { page, limit } = req.query;
 	selectArticleById(article_id)
 		.then(() => {
-			selectCommentsByArticleId(article_id).then((comments) => {
-				res.status(200).send({ comments });
-			});
+			return selectCommentsByArticleId(article_id, page, limit);
+		})
+		.then((comments) => {
+			res.status(200).send({ comments });
 		})
 		.catch(next);
 };
@@ -56,5 +57,5 @@ exports.patchCommentVotesByCommentId = (req, res, next) => {
 		.then((updatedComment) => {
 			res.status(200).send({ comment: updatedComment });
 		})
-    .catch(next)
+		.catch(next);
 };

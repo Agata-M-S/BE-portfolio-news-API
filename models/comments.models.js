@@ -1,13 +1,21 @@
 const db = require("../db/connection");
+const { paginate } = require("../utils");
 
-exports.selectCommentsByArticleId = (article_id) => {
+exports.selectCommentsByArticleId = (article_id, page, limit) => {
 	const sortBy = ` ORDER BY created_at DESC`;
 
 	let queryStr = `SELECT * FROM comments WHERE article_id = $1 ${sortBy} `;
 
-	return db.query(queryStr, [article_id]).then(({ rows }) => {
-		return rows;
-	});
+	return Promise.all([paginate(queryStr, page, limit), article_id])
+		.then((resolvedPromises) => {
+			const queryStr = resolvedPromises[0];
+			const article_id = resolvedPromises[1];
+
+			return db.query(queryStr, [article_id]);
+		})
+		.then(({ rows }) => {
+			return rows;
+		});
 };
 
 exports.insertCommentsByArticleId = (article_id, insert) => {
@@ -55,18 +63,25 @@ exports.removeCommentById = (comment_id) => {
 		});
 };
 
-exports.updateCommentVotesByCommentId = (selectedComment, comment_id, inc_votes) => {
+exports.updateCommentVotesByCommentId = (
+	selectedComment,
+	comment_id,
+	inc_votes
+) => {
 	if (typeof inc_votes != "number") {
 		return Promise.reject({ status: 400, msg: "Bad request" });
 	}
-  const updatedVotes = (selectedComment.votes += inc_votes)
+	const updatedVotes = (selectedComment.votes += inc_votes);
 
-  return db.query(`
+	return db
+		.query(
+			`
   UPDATE comments
   SET votes = ${updatedVotes}
   WHERE comment_id = ${comment_id}
-  RETURNING *`)
-  .then(({ rows }) => {
-    return rows[0];
-  });
+  RETURNING *`
+		)
+		.then(({ rows }) => {
+			return rows[0];
+		});
 };
