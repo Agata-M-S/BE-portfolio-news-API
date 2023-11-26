@@ -845,3 +845,41 @@ describe("GET /api/articles pagination", () => {
 			});
 	});
 });
+describe('GET pagination n  /api/articles/:article_id/comments', () => {
+  test("200: responds with an array of paginated comments limited to 10", () => {
+		return request(app)
+			.get("/api/articles/1/comments?page=1")
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toHaveLength(10);
+			});
+	});
+  test("200: responds with an array of paginated comments limited to specified limit (11)", () => {
+		return request(app)
+			.get("/api/articles/1/comments?limit=11&page=1")
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toHaveLength(11);
+			});
+	});
+  test("200: responds with an array of correct amount of paginated comments on the last page", () => {
+		return request(app)
+			.get("/api/articles/1/comments?page=2")
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toHaveLength(1);
+			});
+	});
+  test("200: responds with an array of paginated articles limited to 10 even if provided invalid page or limit input e.i not a number", () => {
+		return request(app)
+			.get("/api/articles/1/comments?limit=not-a-num&page=not-a-number")
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toHaveLength(10);
+			});
+	});
+});
