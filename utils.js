@@ -6,9 +6,9 @@ exports.paginate = (queryStr, page, limit) => {
 		limit = 10;
 	}
 	if (!page || typeof limit != "number") {
-		if (page === "next") {
+		if (page == "next") {
 			page += 1;
-		} else if (page === "previous") {
+		} else if (page == "previous") {
 			page -= 1;
 		}
     else
