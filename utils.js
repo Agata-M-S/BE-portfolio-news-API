@@ -5,11 +5,12 @@ exports.paginate = (queryStr, page, limit) => {
 	if (!limit || typeof limit != "number") {
 		limit = 10;
 	}
+  
 	if (!page || typeof limit != "number") {
 		if (page == "next") {
-			page += 1;
+			page = page + 1;
 		} else if (page == "previous") {
-			page -= 1;
+      page = 	page - 1;
 		}
     else
 		page = 1;
