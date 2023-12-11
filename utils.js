@@ -1,5 +1,4 @@
 exports.paginate = (queryStr, page, limit) => {
-  
 	limit = +limit;
 	page = +page;
 
@@ -7,11 +6,17 @@ exports.paginate = (queryStr, page, limit) => {
 		limit = 10;
 	}
 	if (!page || typeof limit != "number") {
+		if (page === "next") {
+			page += 1;
+		} else if (page === "previous") {
+			page -= 1;
+		}
+    else
 		page = 1;
 	}
 
 	const offset = (page - 1) * limit;
-	
+
 	queryStr += ` LIMIT ${limit} OFFSET ${offset}`;
 
 	return queryStr;
