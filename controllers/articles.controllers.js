@@ -5,7 +5,7 @@ const {
 	insertArticle,
 } = require("../models/articles.models");
 const { checkIfTopicExists } = require("../models/topics.models");
-const { paginate } = require("../utils");
+
 
 exports.getArticleById = (req, res, next) => {
 	const { article_id } = req.params;
@@ -24,9 +24,9 @@ exports.getAllArticles = (req, res, next) => {
 		.then(() => {
 			return selectAllArticles(topic, sort_by, order, page, limit);
 		})
-		.then((articles) => {
+		.then((data) => {
       
-			res.status(200).send({ articles });
+			res.status(200).send({ articles: data[0], totalCount: data[1] });
 		})
 		.catch(next);
 };

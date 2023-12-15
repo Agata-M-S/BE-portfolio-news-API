@@ -20,7 +20,9 @@ exports.selectCommentsByArticleId = (article_id, page, limit) => {
 
 exports.insertCommentsByArticleId = (article_id, insert) => {
 	const { username, body } = insert;
-
+// if(!body){
+//   Promise.reject({status: 400, msg: "comment cannot be empty"})
+// }
 	return db
 		.query(
 			`INSERT INTO comments (author, body, article_id)

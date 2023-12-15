@@ -61,14 +61,31 @@ exports.selectAllArticles = (topic, sort_by, order, page, limit) => {
 	}
 
 	queryStr += groupBy + sortBy + orderBy;
+	let articleCount;
+	if (topic) {
+		articleCount = db.query(
+			`SELECT CAST(COUNT(article_id) AS INT ) AS total_count FROM articles WHERE topic = $1`,
+			[topic]
+		);
+	} else {
+		articleCount = db.query(
+			`SELECT CAST(COUNT(article_id) AS INT ) AS total_count FROM articles`
+		);
+	}
+  queryStr = paginate(queryStr,page, limit)
+  const articles = db.query(queryStr, queryValues)
 
-	return Promise.all([paginate(queryStr, page, limit), queryValues])
-		.then((resolvedPromise) => {
-			return db.query(resolvedPromise[0], resolvedPromise[1]);
-		})
-		.then(({ rows }) => {
-			return rows;
-		});
+  return Promise.all([articles, articleCount]).then((promises)=>{
+    return [promises[0].rows, promises[1].rows[0].total_count]
+  })
+	// return Promise.all([paginate(queryStr, page, limit), queryValues, articleCount])
+	// 	.then((resolvedPromise) => {
+	// 		return db.query(resolvedPromise[0], resolvedPromise[1], resolvedPromise[2]);
+	// 	})
+	// 	.then(({ rows }) => {
+  //     console.log(rows);
+	// 		return rows;
+	// 	});
 };
 
 exports.updateVotesByArticleId = (article, article_id, inc_votes) => {
